@@ -3,3 +3,6 @@ venv
 .idea
 *.pyc
 *.jpg
+*.xml
+test_dataset/good
+test_dataset/bad

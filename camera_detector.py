@@ -93,7 +93,7 @@ def detect(gray, frame):
         # Draw the left eye.
         if l_eye_ar < EYE_AR_THRESH:
             both_eyes_open = False
-            col = (100, 100, 0)
+            col = (90, 90, 0)
         else:
             col = (255, 255, 0)
 
@@ -103,7 +103,7 @@ def detect(gray, frame):
         # Draw the right eye.
         if r_eye_ar < EYE_AR_THRESH:
             both_eyes_open = False
-            col = (0, 100, 100)
+            col = (0, 90, 90)
         else:
             col = (0, 255, 255)
 

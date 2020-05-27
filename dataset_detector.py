@@ -56,5 +56,5 @@ def classify(path):
                 pass
 
     print('')
-    print('Finished classification. Failed: {} Succeeded: {}'.format(failed, length - failed))
+    print('Finished classification. Failed: {} Succeeded: {}'.format(failed, length - failed - 3))
     print('You can find the photos in {} and {}.'.format(path + '/good', path + '/bad'))

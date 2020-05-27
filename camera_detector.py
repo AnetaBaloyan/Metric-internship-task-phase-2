@@ -130,39 +130,54 @@ def detect(gray, frame):
     return frame, shot_flag
 
 
+def draw_shots_label(frame, n):
+    cv2.cv2.putText(frame, "Shots taken: {}".format(n), (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 150, 0), 3)
+
+
 # Cleans the environment, starts the camera and the detector.
 def start_detector():
     clean_photos()
 
+    # Keep track of shots taken.
+    shots_count = 0
+
     video_capture = cv2.VideoCapture(0)
     shot_flag = False
-    end_time = -1
+    freeze = False
+    freeze_end_time = -1
     while True:
-        # Captures video_capture frame by frame
+        # Captures video_capture frame by frame.
         _, frame = video_capture.read()
 
-        # To capture image in monochrome
+        # To capture image in monochrome.
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        if not shot_flag:
-            # calls the detect() function
-            clean_frame = frame.copy()
-            canvas, shot_flag = detect(gray, frame)
+        # Calls the detect() function.
+        clean_frame = frame.copy()
+        canvas, shot_flag = detect(gray, frame)
 
-            if shot_flag:
-                end_time = time.time() + 1
-                name = str(time.time())
-                cv2.imwrite('./captured_photos/%s.jpg' % name, frame)
-                cv2.imwrite('./captured_photos/%s.jpg' % (name + '_clean'), clean_frame)
-        else:
-            if end_time != -1 and time.time() >= end_time:
-                shot_flag = False
-                end_time = -1
+        # Check if we're out of freeze state.
+        if freeze and time.time() >= freeze_end_time:
+            freeze = False
 
-        # Displays the result on camera feed
+        if shot_flag and not freeze:
+            shots_count = shots_count + 1
+
+            # Take a shot.
+            name = str(time.time())
+            cv2.imwrite('./captured_photos/%s.jpg' % name, frame)
+            cv2.imwrite('./captured_photos/%s.jpg' % (name + '_clean'), clean_frame)
+
+            # If it's a shot, make sure the next 1 second we freeze process,
+            # so that we don't take many similar shots.
+            freeze_end_time = time.time() + 1
+            freeze = True
+
+        draw_shots_label(frame, shots_count)
+        # Displays the result on camera feed.
         cv2.imshow('Video', frame)
 
-        # The control breaks once q key is pressed
+        # The control breaks once q key is pressed.
         if cv2.waitKey(1) & 0xff == ord('q'):
             break
 

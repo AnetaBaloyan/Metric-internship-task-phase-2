@@ -1,6 +1,6 @@
 import cv2
 import os
-from camera_detector import detect, clean_cascades, download_and_build_cascades
+from camera_detector import detect
 
 
 # Clears old results and creates 'good' and 'bad' folders.
@@ -27,13 +27,11 @@ def prep_dir(path):
 def classify(path):
     print('Preparing the directory...')
     prep_dir(path)
-    clean_cascades()
-    left_eye_cascade, right_eye_cascade, \
-    face_cascade, smile_cascade = download_and_build_cascades()
 
     length = len(os.listdir(path))
     current = 0
-    print('Classifying directory %s ...' % path)
+    failed = 0
+    print('Classifying directory {} ...'.format(path))
 
     for file_name in os.listdir(path):
 
@@ -47,13 +45,16 @@ def classify(path):
             img = cv2.imread(path + '/' + file_name)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-            canvas, isgood = detect(gray, img, left_eye_cascade,
-                                    right_eye_cascade, face_cascade, smile_cascade)
+            try:
+                canvas, isgood = detect(gray, img)
+                if isgood:
+                    cv2.imwrite(path + '/good/%s' % file_name, img)
+                else:
+                    cv2.imwrite(path + '/bad/%s' % file_name, img)
+            except:
+                failed = failed + 1
+                pass
 
-            if isgood:
-                cv2.imwrite(path + '/good/%s' % file_name, img)
-            else:
-                cv2.imwrite(path + '/bad/%s' % file_name, img)
     print('')
-    print('Finished classification. You can find the photos in %s and %s.'
-          % (path + '/good', path + '/bad'))
+    print('Finished classification. Failed: {} Succeeded: {}'.format(failed, length - failed))
+    print('You can find the photos in {} and {}.'.format(path + '/good', path + '/bad'))

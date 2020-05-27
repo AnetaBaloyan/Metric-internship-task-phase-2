@@ -52,7 +52,7 @@ def detect(gray, frame, left_eye_cascade, right_eye_cascade, face_cascade, smile
         roi_gray = gray[y:y + h, x:x + w]
         roi_color = frame[y:y + h, x:x + w]
 
-        smiles = smile_cascade.detectMultiScale(roi_gray, 1.2, 50)
+        smiles = smile_cascade.detectMultiScale(roi_gray, 1.8, 40)
 
         left_eyes = left_eye_cascade.detectMultiScale(roi_gray, 1.4, 20)
         right_eyes = right_eye_cascade.detectMultiScale(roi_gray, 1.4, 20)
